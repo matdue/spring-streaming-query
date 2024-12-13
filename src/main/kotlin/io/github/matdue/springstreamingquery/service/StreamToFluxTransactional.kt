@@ -5,6 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 
+/**
+ * Specialization of StreamToFlux which ensures that consuming the stream is done within a read-only transaction,
+ * and each element will be detached from entity manager before processing to minimize memory consumption.
+ */
 class StreamToFluxTransactional<T : Any>(
     timeout: Long,
     firstTimeout: Long? = null,

@@ -112,10 +112,12 @@ open class StreamToFlux<T : Any>(
                     consumeStream(streamSupplier) { consumeElement(it) }
                 }
                 buffer.offer(WrappedFinish(), getOfferTimeout(), TimeUnit.SECONDS)
-            } catch (ex: TimeoutException) {
+                // Ignore any errors; if the consumer does not read WrappedFinish, it would abort the Flux
+            } catch (_: TimeoutException) {
                 // Subscriber is too slow or has cancelled => exit as there is nothing we can do
             } catch (ex: Throwable) {
                 buffer.offer(WrappedError(ex), getOfferTimeout(), TimeUnit.SECONDS)
+                // Ignore any errors; if the consumer does not read WrappedFinish, it would abort the Flux
             }
         }
     }

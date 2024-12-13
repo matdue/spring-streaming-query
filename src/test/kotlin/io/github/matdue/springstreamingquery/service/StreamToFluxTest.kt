@@ -44,6 +44,14 @@ class StreamToFluxTest {
 
     @Test
     fun `Stream should not be processed in one pass`() {
+        // In other words: The elements in the stream should be processed one-by-one.
+        // Example: First element is read from stream, put into Flux, then the next element is read, and put into Flux,
+        // and so on. The Flux does some buffering, but it should not buffer the whole stream.
+        // Each processed element is stored twice in caughtEntities: When read from stream, it is stored unmodified,
+        // i.e. as a positive number. When read from Flux, it is stored as a negative number.
+        // The result should look like this: 1, -1, 2, -2, ...
+        // As the Flux does some buffering, it might look like this: 1, 2, -1, 3, -2, ...
+        // But it should not look like this: 1, 2, 3, ..., 9, -1, -2, -3, ..., -9
         val stream = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         val caughtEntities = synchronizedList(mutableListOf<Int>())
 
